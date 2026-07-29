@@ -334,9 +334,9 @@ namespace ConsoleApp1
 
             students.Add(new Student
             {
-                FullName = "Yara Adel",
+                FullName = "Layla Mostafa",
                 YearOfStudy = 2,
-                Gpa = 3.5,
+                Gpa = 3.7,
                 CreditsCompleted = 60
             });
 
