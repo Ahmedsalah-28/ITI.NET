@@ -1,4 +1,4 @@
-﻿
+
 
 
 using Microsoft.EntityFrameworkCore;
@@ -80,7 +80,7 @@ namespace ConsoleApp1
                                 {
                                     CourseName = "Web Development Using .NET",
                                     Credits = 4,
-                                    InstructorId = hamdy.Id
+                                    InstructorId = hamdyForLoading.Id
                                 },
                                 new Course
                                 {
@@ -281,7 +281,7 @@ namespace ConsoleApp1
                 var webCourse = await context.Courses
                     .FirstAsync(c => c.CourseName == "Web Development Using .NET");
 
-                webCourse.InstructorId = hamdy.Id;
+                webCourse.InstructorId = hamdyForLoading.Id;
 
                 await context.SaveChangesAsync();
 
@@ -325,10 +325,10 @@ WHERE CourseName='Web Development Using .NET';
 
                 //-----------------part F -------------------------
 
-                Lab ID = 7
-                 Extra courses required = (7 % 3) + 2 = 3
+                // Lab ID = 7
+// Extra courses required = (7 % 3) + 2 = 3
 
-                var hamdy = await context.Instructors
+                var hamdyForLoading = await context.Instructors
                     .FirstAsync(i => i.FullName == "Hamdy");
 
                 var extraCourses = new List<Course>()
@@ -337,19 +337,19 @@ WHERE CourseName='Web Development Using .NET';
                                         {
                                             CourseName = "ASP.NET Core",
                                             Credits = 3,
-                                            InstructorId = hamdy.Id
+                                            InstructorId = hamdyForLoading.Id
                                         },
                                         new Course
                                         {
                                             CourseName = "Entity Framework Core",
                                             Credits = 3,
-                                            InstructorId = hamdy.Id
+                                            InstructorId = hamdyForLoading.Id
                                         },
                                         new Course
                                         {
                                             CourseName = "REST API Development",
                                             Credits = 3,
-                                            InstructorId = hamdy.Id
+                                            InstructorId = hamdyForLoading.Id
                                         }
                                     };
 
@@ -364,7 +364,7 @@ WHERE CourseName='Web Development Using .NET';
                 var instructors = await context.Instructors
                                     .ToListAsync();
 
-                foreach (var instructor in instructors)
+                foreach (var instructor in instructorsWithCourses)
                 {
                     Console.WriteLine($"{instructor.FullName} : {instructor.Courses.Count}");
                 }
@@ -384,7 +384,7 @@ Lazy loading is disabled.
 
 
 
-                var instructors = await context.Instructors
+                var instructorsWithCourses = await context.Instructors
                                 .Include(i => i.Courses)
                                 .ToListAsync();
 
@@ -550,7 +550,16 @@ relationship to the deleted Instructor.
 Migration Reflection
 ---------------------------------------------------------
 
-No rollback needed.
+A migration issue occurred while creating the Instructor-Course relationship.
+
+The first migration (updateTables) created the relationship incorrectly.
+I fixed the model, created a new migration (AddInstructorCourseRelationship),
+and updated the database again.
+
+If rollback had been needed, I would have used:
+
+Update-Database <PreviousMigrationName>
+Remove-Migration
 
 If a migration had failed, I would have used:
 
