@@ -14,88 +14,88 @@ namespace ConsoleApp1
         {
 
 
-            using (StudentPortalContext context = new StudentPortalContext())
-            {
-                // ===========================
-                // Students
-                // ===========================
+            //using (StudentPortalContext context = new StudentPortalContext())
+            //{
+            //    // ===========================
+            //    // Students
+            //    // ===========================
 
-                var students = new List<Student>
-                        {
-                            new Student
-                            {
-                                FullName = "Yara Adel",
-                                YearOfStudy = 2,
-                                Gpa = 3.5
-                            },
-                            new Student
-                            {
-                                FullName = "Omar Hesham",
-                                YearOfStudy = 3,
-                                Gpa = 2.8
-                            },
-                            new Student
-                            {
-                                FullName = "Nada Samir",
-                                YearOfStudy = 1,
-                                Gpa = 3.9
-                            },
-                            new Student
-                            {
-                                FullName = "Kareem Fouad",
-                                YearOfStudy = 4,
-                                Gpa = 3.2
-                            }
-                        };
+            //    var students = new List<Student>
+            //            {
+            //                new Student
+            //                {
+            //                    FullName = "Yara Adel",
+            //                    YearOfStudy = 2,
+            //                    Gpa = 3.5
+            //                },
+            //                new Student
+            //                {
+            //                    FullName = "Omar Hesham",
+            //                    YearOfStudy = 3,
+            //                    Gpa = 2.8
+            //                },
+            //                new Student
+            //                {
+            //                    FullName = "Nada Samir",
+            //                    YearOfStudy = 1,
+            //                    Gpa = 3.9
+            //                },
+            //                new Student
+            //                {
+            //                    FullName = "Kareem Fouad",
+            //                    YearOfStudy = 4,
+            //                    Gpa = 3.2
+            //                }
+            //            };
 
-                context.Students.AddRange(students);
+            //    context.Students.AddRange(students);
 
-                // ===========================
-                // Instructors
-                // ===========================
+            //    // ===========================
+            //    // Instructors
+            //    // ===========================
 
-                var hamdy = new Instructor
-                {
-                    FullName = "Hamdy",
-                    YearsOfExperience = 10
-                };
+            //    var hamdy = new Instructor
+            //    {
+            //        FullName = "Hamdy",
+            //        YearsOfExperience = 10
+            //    };
 
-                var mona = new Instructor
-                {
-                    FullName = "Mona Khalil",
-                    YearsOfExperience = 6
-                };
+            //    var mona = new Instructor
+            //    {
+            //        FullName = "Mona Khalil",
+            //        YearsOfExperience = 6
+            //    };
 
-                context.Instructors.AddRange(hamdy, mona);
+            //    context.Instructors.AddRange(hamdy, mona);
 
-                await context.SaveChangesAsync();
+            //    await context.SaveChangesAsync();
 
-                // ===========================
-                // Courses
-                // ===========================
+            //    // ===========================
+            //    // Courses
+            //    // ===========================
 
-                var courses = new List<Course>
-                            {
-                                new Course
-                                {
-                                    CourseName = "Web Development Using .NET",
-                                    Credits = 4,
-                                    InstructorId = hamdyForLoading.Id
-                                },
-                                new Course
-                                {
-                                    CourseName = "Database Fundamentals",
-                                    Credits = 3,
-                                    InstructorId = mona.Id
-                                }
-                            };
+            //    var courses = new List<Course>
+            //                {
+            //                    new Course
+            //                    {
+            //                        CourseName = "Web Development Using .NET",
+            //                        Credits = 4,
+            //                        InstructorId = hamdy.Id
+            //                    },
+            //                    new Course
+            //                    {
+            //                        CourseName = "Database Fundamentals",
+            //                        Credits = 3,
+            //                        InstructorId = mona.Id
+            //                    }
+            //                };
 
-                context.Courses.AddRange(courses);
+            //    context.Courses.AddRange(courses);
 
-                await context.SaveChangesAsync();
+            //    await context.SaveChangesAsync();
 
-                Console.WriteLine("Data Inserted Successfully.");
-            }
+            //    Console.WriteLine("Data Inserted Successfully.");
+            //}
 
 
 
@@ -148,8 +148,9 @@ namespace ConsoleApp1
 
                 //// Before Save the Id was 0.
                 //// After Save SQL Server generated the identity value.
-                //me.YearOfStudy = 3;
 
+
+                me.YearOfStudy = 3;
                 await context.SaveChangesAsync();
 
                 Console.WriteLine("Year updated.");
@@ -200,6 +201,7 @@ namespace ConsoleApp1
 
 
                  */
+                Console.WriteLine("---------------------------------------------");
 
                 try
                 {
@@ -214,12 +216,22 @@ namespace ConsoleApp1
 
                     await context.SaveChangesAsync();
                 }
-                catch (DbUpdateException ex)
+                catch (Exception ex)
                 {
-                    Console.WriteLine("Database rejected the student because FullName is required.");
+                    Console.WriteLine(ex.GetType().FullName);
+                    Console.WriteLine(ex.Message);
+                    context.ChangeTracker.Clear();
 
-                    Console.WriteLine(ex.GetType().Name);
+
                 }
+  
+
+                Console.WriteLine("---------------------------------------------");
+                Console.WriteLine("---------------------------------------------");
+                Console.WriteLine("---------------------------------------------");
+                Console.WriteLine("---------------------------------------------");
+                Console.WriteLine("---------------------------------------------");
+
 
                 //// Exception Type: DbUpdateException
 
@@ -269,23 +281,23 @@ namespace ConsoleApp1
                  */
 
 
+                Console.WriteLine("cont");
 
                 //Apply it. In SSMS, confirm the InstructorId column exists and find the foreign-key constraint under the table's Keys node. Record its exact name.
                 //FK_Courses_Instructors_InstructorId
 
-
-
-                var hamdy = await context.Instructors
-                        .FirstAsync(i => i.FullName == "Hamdy");
+                var hamdyInstructor = await context.Instructors
+                    .FirstAsync(i => i.FullName == "Hamdy");
 
                 var webCourse = await context.Courses
                     .FirstAsync(c => c.CourseName == "Web Development Using .NET");
 
-                webCourse.InstructorId = hamdyForLoading.Id;
+                webCourse.InstructorId = hamdyInstructor.Id;
 
                 await context.SaveChangesAsync();
 
                 Console.WriteLine("Course linked successfully.");
+
                 /* 
                  
    SELECT *
@@ -309,11 +321,13 @@ WHERE CourseName='Web Development Using .NET';
 
                     await context.SaveChangesAsync();
                 }
-                catch (DbUpdateException ex)
+                catch (Exception ex)
                 {
-                    Console.WriteLine("Foreign key constraint worked.");
+                    Console.WriteLine(ex.GetType().FullName);
+                    Console.WriteLine(ex.Message);
+                    context.ChangeTracker.Clear();
 
-                    Console.WriteLine(ex.InnerException?.Message);
+
                 }
 
                 // Exception: DbUpdateException
@@ -326,10 +340,10 @@ WHERE CourseName='Web Development Using .NET';
                 //-----------------part F -------------------------
 
                 // Lab ID = 7
-// Extra courses required = (7 % 3) + 2 = 3
+                //  Extra courses required = (7 % 3) + 2 = 3
 
                 var hamdyForLoading = await context.Instructors
-                    .FirstAsync(i => i.FullName == "Hamdy");
+                             .FirstAsync(i => i.FullName == "Hamdy");
 
                 var extraCourses = new List<Course>()
                                     {
@@ -364,9 +378,9 @@ WHERE CourseName='Web Development Using .NET';
                 var instructors = await context.Instructors
                                     .ToListAsync();
 
-                foreach (var instructor in instructorsWithCourses)
+                foreach (var instructor3 in instructors)
                 {
-                    Console.WriteLine($"{instructor.FullName} : {instructor.Courses.Count}");
+                    Console.WriteLine($"{instructor3.FullName} : {instructor3.Courses.Count}");
                 }
 
                 /*
@@ -385,14 +399,14 @@ Lazy loading is disabled.
 
 
                 var instructorsWithCourses = await context.Instructors
-                                .Include(i => i.Courses)
-                                .ToListAsync();
+                    .Include(i => i.Courses)
+                    .ToListAsync();
 
-                foreach (var instructor in instructors)
+                foreach (var instructor2 in instructorsWithCourses)
                 {
-                    Console.WriteLine(instructor.FullName);
+                    Console.WriteLine(instructor2.FullName);
 
-                    foreach (var course in instructor.Courses)
+                    foreach (var course in instructor2.Courses)
                     {
                         Console.WriteLine($"   {course.CourseName}");
                     }
@@ -552,23 +566,16 @@ Migration Reflection
 
 A migration issue occurred while creating the Instructor-Course relationship.
 
-The first migration (updateTables) created the relationship incorrectly.
-I fixed the model, created a new migration (AddInstructorCourseRelationship),
-and updated the database again.
+The first migration (updateTables) created the relationship incorrectly
+(InstructorId was non-nullable and the delete behavior was not correct).
 
-If rollback had been needed, I would have used:
+I fixed the model, created a new migration
+(AddInstructorCourseRelationship), and updated the database.
+
+If rollback had been required, I would have used:
 
 Update-Database <PreviousMigrationName>
 Remove-Migration
-
-If a migration had failed, I would have used:
-
-Update-Database <PreviousMigrationName>
-
-Remove-Migration
-
-Then I would fix the model or migration issue,
-create a new migration, and apply it again.
 
 
 ---------------------------------------------------------
