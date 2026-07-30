@@ -1,0 +1,22 @@
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ConsoleApp1
+{
+    public class Course
+    {
+        public int Id { get; set; }
+        [Required]
+        [MaxLength(150)]
+        public string CourseName { get; set; } = "";
+        public int Credits { get; set; }
+        //public int InstructorId { get; set; }
+        //public Instructor Instructor { get; set; } = null!;
+
+        // Nullable because OnDelete = SetNull
+        public int? InstructorId { get; set; }
+
+        public Instructor? Instructor { get; set; }
+    }
+
+
+}
