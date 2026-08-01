@@ -1,0 +1,31 @@
+﻿@model List<Student>
+
+<h2>Student Portal — Build #149</h2>
+
+<p>
+    <strong>Owner:</strong> @ViewBag.Owner
+    <br />
+    <strong>Stamp A:</strong> @ViewBag.StampA
+    <br />
+    <strong>Stamp B:</strong> @ViewBag.StampB
+</p>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Full Name</th>
+            <th>Year Of Study</th>
+            <th>GPA</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var student in Model)
+        {
+            <tr>
+                <td>@student.FullName</td>
+                <td>@student.YearOfStudy</td>
+                <td>@student.Gpa.ToString("F2")</td>
+            </tr>
+        }
+    </tbody>
+</table>
