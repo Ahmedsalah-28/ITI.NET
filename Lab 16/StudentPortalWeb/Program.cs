@@ -1,157 +1,152 @@
+// LAB 16 — Lab ID: 7 | MAX_YEAR = 4 | MIN_GPA = 3.0 | INTAKE_CODE = itiB
+// The default route is placed at the bottom because it is the most general route.
+// If it were placed before more specific routes,
+// it could match requests first and prevent the specific routes from being reached.
 
-
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using StudentPortalWeb.Constraints;
 using StudentPortalWeb.Models;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace StudentPortalWeb.Controllers
+namespace StudentPortalWeb
 {
-    public class StudentsController : Controller
+    public class Program
     {
-        private readonly StudentPortalContext _context;
-
-        public StudentsController(StudentPortalContext context)
+        public static void Main(string[] args)
         {
-            _context = context;
-        }
+            
+            var builder = WebApplication.CreateBuilder(args);
 
-        public async Task<IActionResult> Index()
-        {
-            var students = await _context.Students
-                .OrderBy(s => s.FullName)
-                .ToListAsync();
-
-            return View(students);
-        }
-
-        
-        public async Task<IActionResult> Details(int id)
-        {
-            var student = await _context.Students
-                .FirstOrDefaultAsync(s => s.Id == id);
-
-            if (student is null)
-            {
-                
-                return NotFound();
-            }
-
-            return View(student);
-        }
-
-        public async Task<IActionResult> ByYear(int year)
-        {
-            var students = await _context.Students
-                .Where(s => s.YearOfStudy == year)
-                .OrderBy(s => s.FullName)
-                .ToListAsync();
-
-            ViewData["Year"] = year;
-
-            return View(students);
-        }
-
-        
-        public async Task<IActionResult> Honours(string band)
-        {
-           
-            if (string.IsNullOrWhiteSpace(band))
-            {
-                return NotFound();
-            }
-
-            IQueryable<Student> query = _context.Students;
-
-            if (string.Equals(band, "first", StringComparison.OrdinalIgnoreCase))
-            {
-                query = query.Where(s => s.Gpa >= 3.5);
-            }
-            else if (string.Equals(band, "second", StringComparison.OrdinalIgnoreCase))
-            {
-                query = query.Where(s => s.Gpa >= 3.0 && s.Gpa < 3.5);
-            }
-            else
-            {
-                query = query.Where(s => s.Gpa < 3.0);
-            }
-
-            var students = await query
-                .OrderBy(s => s.FullName)
-                .ToListAsync();
-
-            ViewData["Band"] = band.ToLowerInvariant();
-
-            return View(students);
-        }
-
-
-        //[HttpGet("students/top/{count:int:range(1,4)}")]
-        public async Task<IActionResult> Topstd([FromRoute] int count)
-        {
-            var students = await _context.Students
-                .OrderByDescending(s => s.Gpa)
-                .Take(count)
-                .ToListAsync();
-
-            return View("Index", students);
-        }
-
-        //[HttpGet("students/intake/{code:intakecode}")]
-
-        public async Task<IActionResult> Intakeitib(string code)
-        {
-            var students = await _context.Students
-                .OrderBy(s => s.FullName)
-                .ToListAsync();
-
-            return View("Index", students);
-        }
-
-
-        // /Students/About is 404 because this action uses attribute routing only,
-        // not the default conventional route.
-        // minGpa belongs in the query string because it is a filter value,
-        // not part of the resource identity.
-
-        [Route("about/ahmed")]
-        // /Students/About returns 404 because this action is reachable only through
-        // its attribute route and not through the default conventional route.
-        // minGpa is placed in the query string because it is a filtering option,
-        // not part of the resource identity.
-
-        public async Task<IActionResult> About([FromQuery] double minGpa = 3.0)
-        {
-            var students = await _context.Students
-                .Where(s => s.Gpa >= minGpa)
-                .OrderBy(s => s.FullName)
-                .ToListAsync();
-
-            return View("Index", students);
-        }
-
-
-        [Route("students/search")]
-        public async Task<IActionResult> Searching([FromQuery] string name)
-        {
-            IQueryable<Student> query = _context.Students;
+            builder.Services.AddControllersWithViews();
 
             
-            if (!string.IsNullOrWhiteSpace(name))
+
+            builder.Services.AddDbContext<StudentPortalContext>(options =>
             {
-                query = query.Where(s => s.FullName.Contains(name));
+
+                options.UseSqlServer("Data Source=AHMEDSALAH\\SQLEXPRESS;Initial Catalog=ITI_StudentPortal;Integrated Security=True;Encrypt=True;Trust Server Certificate=True")
+                .LogTo(Console.WriteLine , LogLevel.Information)
+                .EnableSensitiveDataLogging();
+            });
+
+
+
+            builder.Services.AddRouting(options =>
+            {
+                options.ConstraintMap.Add("honourBand", typeof(HonourBandConstraint));
+                options.ConstraintMap.Add("intakecode", typeof(IntakeCodeConstraint));
+            });
+
+            var app = builder.Build();
+           
+            if (!app.Environment.IsDevelopment())
+            {
+                app.UseExceptionHandler("/Home/Error");
+                app.UseHsts();
             }
 
-            var students = await query
-                .OrderBy(s => s.FullName)
-                .ToListAsync();
 
-            ViewData["Name"] = name;
+            app.Use(async (context, next) =>
+            {
+                Console.WriteLine($"[START] Request path : {context.Request.Path}");
+                await next.Invoke();
+                Console.WriteLine($"[END] Request path : {context.Request.Path}");
+            });
 
-            return View(students);
+            app.UseHttpsRedirection();
+            app.UseStaticFiles();
+
+            app.UseRouting();
+            //app.UseAuthentication();
+            app.UseAuthorization();
+
+
+
+            app.MapControllerRoute(
+                name: "studentsList",
+                pattern: "students",
+                defaults: new { controller = "Students", action = "Index" }
+                );
+            // Yes, MAX_YEAR is accepted because the range constraint is inclusive.
+            app.MapControllerRoute(
+                name: "studentsTop",
+                pattern: "students/top/{count:int:range(1,4)}",
+                defaults: new
+                {
+                    controller = "Students",
+                    action = "Topstd"
+                });
+
+
+
+            app.MapControllerRoute(
+                name: "studentsDetails",
+                pattern: "students/{id:int}",
+                defaults: new { controller = "Students", action = "Details" }
+                );
+
+            app.MapControllerRoute(
+                name: "studentsByYear",
+                pattern: "students/year/{year:int:range(1,4)}",
+                defaults: new { controller = "Students", action = "ByYear" }
+                );
+
+            app.MapControllerRoute(
+                name: "studentsHonours",
+                pattern: "students/honours/{band:honourBand}",
+                defaults: new { controller = "Students", action = "Honours" }
+                );
+            // Yes. It is acceptable because different URLs can represent the same resource when it improves usability or readability.
+            app.MapControllerRoute(
+                name: "studentsRoster",
+                pattern: "roster",
+                defaults: new
+                {
+                    controller = "Students",
+                    action = "Index"
+                });
+
+            app.MapControllerRoute(
+                name: "studentsIntake",
+                pattern: "students/intake/{code:intakecode}",
+                defaults: new
+                {
+                    controller = "Students",
+                    action = "Intakeitib"
+                });
+
+            app.MapControllerRoute(
+                name: "default",
+                pattern: "{controller=Home}/{action=Index}/{id?}");
+
+            app.MapControllers();
+
+
+
+
+            app.Run();
         }
     }
 }
+
+#region 📋 Full TODO Checklist
+// ---------------------------------------------------------------------
+// Program.cs — Phase One (before builder.Build())
+//   TODO 1: Register your constraint's nickname in the constraint map
+//           [Block 4 — sits first only because it must run before Build]
+//
+// Program.cs — Phase Two (after builder.Build())
+//   TODO 2: Custom routes for the students list and the student detail   [Block 2]
+//   TODO 3: Constrain the detail id to integers; add the by-year route   [Block 3]
+//   TODO 4: Add the honours route using your own constraint's nickname   [Block 4]
+//
+// Constraints/HonourBandConstraint.cs
+//   TODO 5: Implement Match so only the three real band names pass       [Block 4]
+//
+// Controllers/StudentsController.cs
+//   TODO 6: Give the search action its own address, and read the query   [Block 5]
+// ---------------------------------------------------------------------
+#endregion
