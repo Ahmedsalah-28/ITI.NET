@@ -89,8 +89,8 @@ namespace StudentPortalWeb.Controllers
         }
 
 
-        [HttpGet("students/top/{count:int:range(1,4)}")]
-        public async Task<IActionResult> Top([FromRoute] int count)
+        //[HttpGet("students/top/{count:int:range(1,4)}")]
+        public async Task<IActionResult> Topstd([FromRoute] int count)
         {
             var students = await _context.Students
                 .OrderByDescending(s => s.Gpa)
@@ -100,9 +100,9 @@ namespace StudentPortalWeb.Controllers
             return View("Index", students);
         }
 
-        [HttpGet("students/intake/{code:intakecode}")]
+        //[HttpGet("students/intake/{code:intakecode}")]
 
-        public async Task<IActionResult> Intake(string code)
+        public async Task<IActionResult> Intakeitib(string code)
         {
             var students = await _context.Students
                 .OrderBy(s => s.FullName)
