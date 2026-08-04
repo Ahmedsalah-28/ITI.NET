@@ -1,0 +1,52 @@
+@model Student
+
+@* LAB 18 — Lab ID: 7 | CHIP_YEAR = 4 | CHIP_LABEL = Final
+
+Model means one Student here because this partial receives one Student,
+while Index.cshtml passes a List<Student>.
+
+*@
+
+<tr>
+    <td>@Model.Id</td>
+
+    <td>
+        <a asp-controller="Students"
+           asp-action="Details"
+           asp-route-id="@Model.Id">
+            @Model.FullName
+        </a>
+
+        @if (Model.YearOfStudy == 4)
+        {
+            <span class="badge bg-success ms-2">Final</span>
+        }
+    </td>
+
+    <td>
+        <year-chip for="@Model.YearOfStudy" />
+    </td>
+
+    <td>
+        <gpa-badge for="@Model.Gpa" />
+    </td>
+</tr>
+
+
+@*
+
+WHAT THE BROWSER RECEIVED:
+
+        <span class="badge bg-warning text-dark" title="rendered by ahmed">Final</span>
+(a)
+After removing @addTagHelper, the year-chip element appeared in the HTML and the Tag Helper did not execute.
+
+(b)
+After removing TagMode, the span was not rendered correctly because no end tag was generated.
+
+(c)
+After renaming the element to yearchip, Razor no longer recognized it as a Tag Helper, so it was rendered as a normal HTML element.
+
+All three failures prevented the Tag Helper from producing the expected HTML output.
+
+*@

@@ -1,0 +1,27 @@
+﻿@model Student
+
+@*
+
+Both partials receive a Student model. A view can use both partials because each partial receives its own model independently.
+
+*@
+
+<div class="card">
+    <div class="card-body">
+
+        <h5 class="card-title">
+            @Model.FullName
+        </h5>
+
+        <p class="card-text">
+            Year: @Model.YearOfStudy
+        </p>
+
+        <p class="card-text">
+            GPA:
+            @* <gpa-badge value="@Model.Gpa.ToString("F2")"></gpa-badge> *@
+               <gpa-badge for="@Model.Gpa"></gpa-badge>
+            </p>
+
+        </div>
+    </div>
