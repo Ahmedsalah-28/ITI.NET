@@ -1,0 +1,55 @@
+﻿@page
+@model StudentPortalWeb.Pages.Roster.CreateModel
+
+@{
+    ViewData["Title"] = "Create Student";
+}
+
+<h1 class="display-5">Create Student</h1>
+
+<p class="lead">
+    Add a new student to the roster.
+</p>
+
+<div class="row">
+    <div class="col-md-6">
+
+        <form method="post">
+
+            @* <div asp-validation-summary="ModelOnly" class="text-danger"></div> *@
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="mb-3">
+                <label asp-for="Student.FullName" class="form-label"></label>
+                <input asp-for="Student.FullName" class="form-control" />
+                <span asp-validation-for="Student.FullName" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Student.YearOfStudy" class="form-label"></label>
+                <input asp-for="Student.YearOfStudy" class="form-control" />
+                <span asp-validation-for="Student.YearOfStudy" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Student.Gpa" class="form-label"></label>
+                <input asp-for="Student.Gpa" class="form-control" />
+                <span asp-validation-for="Student.Gpa" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                Create
+            </button>
+
+            <a asp-page="Index" class="btn btn-secondary">
+                Cancel
+            </a>
+
+        </form>
+
+    </div>
+</div>
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+}
